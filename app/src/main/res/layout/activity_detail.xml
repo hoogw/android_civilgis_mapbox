@@ -17,10 +17,29 @@
 
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:mapbox="http://schemas.android.com/tools"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
+
+
+
+<!-- mapbox -->
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        mapbox:style_url="@string/style_mapbox_streets"/>
+
+
+
+
+    <!-- End of mapbox -->
+
+
+
 
     <!-- Layer 1 -->
     <android.support.design.widget.AppBarLayout
@@ -72,56 +91,6 @@
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
-
-
-
-
-
-
-    <!-- transparency fragment   position is android:layout_gravity="bottom|right|end"-->
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right|end"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:background="@color/white"
-        android:orientation="vertical">
-
-        <CheckBox
-            android:id="@+id/fade_in_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checked="true"
-            android:onClick="setFadeIn"
-            android:text="@string/fade_in" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/transparency"/>
-
-        <SeekBar
-            android:id="@+id/transparencySeekBar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-    <!-- END transparency fragment -->
-
-
-
-
-
-
-
-
-
-
 
 
 
