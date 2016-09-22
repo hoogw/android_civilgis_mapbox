@@ -85,6 +85,7 @@ public class CheeseListFragment extends Fragment {
 
         if (__area.equals("city")) {
 
+            list.add("city_all");
             list.add("city_zoning");
             list.add("city_general_land_use");
             list.add("city_address");
@@ -102,9 +103,9 @@ public class CheeseListFragment extends Fragment {
 
             list.add("city_neighbor");
             list.add("city_fire_geoproximity");
-            list.add("city_fire_district");
+
             list.add("city_fire_agency");
-            list.add("city_fire_station_boundary");
+           // list.add("city_fire_station_boundary");
         }
 
 

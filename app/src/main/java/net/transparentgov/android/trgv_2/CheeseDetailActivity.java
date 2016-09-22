@@ -30,6 +30,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -61,9 +62,20 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.style.layers.FillLayer;
+import com.mapbox.mapboxsdk.style.layers.Property;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.mapboxsdk.style.sources.TileSet;
+import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.Polygon;
 import com.mapbox.services.commons.geojson.MultiLineString;
+import com.mapbox.services.commons.geojson.LineString;
+import com.mapbox.services.commons.geojson.Point;
+
+
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,11 +182,56 @@ public class CheeseDetailActivity extends AppCompatActivity {
                 // Customize map with markers, polylines, etc.
                 map = mapboxMap;
 
-                map.setStyleUrl(Area.getMapBoxStyleUrl(area_subject));
 
-                map.animateCamera(CameraUpdateFactory
-                        .newCameraPosition(position), 7000);
 
+                // ############### tileJSON ##########
+              // if use tilejson, then use this line to set style URL which point to server hosted tile json. otherwise, you could programly add source and layer and style layers.
+                // use tilejson, you can't programmly, all tilejson has to be fixed write on server.
+                map.setStyleUrl(Area.getMapBoxStyleUrl( _area_, area_subject));
+                // ############### END ######## tileJSON ##########
+
+
+
+
+                //****************** programly add vector tiles *****************************
+
+
+
+
+               /* TileSet _tileset = new TileSet("8", "http://166.62.80.50:10/tileserver/tileserver.php/city/{z}/{x}/{y}.pbf");
+
+
+                VectorSource mapbox_style_source = new VectorSource("city", _tileset);
+
+                map.addSource(mapbox_style_source);
+
+
+
+
+
+                FillLayer _fillLayer = new FillLayer("Lid_city_zoning","city");
+               // _fillLayer.setSourceLayer("city_zoning");
+
+
+
+                map.addLayer(_fillLayer.withSourceLayer("city_zoning"));*/
+
+
+
+
+
+                //************************  END ************* programly add vector tiles *****************************
+
+
+
+
+
+
+              //  map.animateCamera(CameraUpdateFactory
+              //          .newCameraPosition(position), 7000);
+
+                map.moveCamera(CameraUpdateFactory
+                        .newCameraPosition(position));
 
 
                 // *****   query rendered feature on click **************
@@ -184,82 +241,43 @@ public class CheeseDetailActivity extends AppCompatActivity {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
 
-                        if (selectedPolygon != null) {
-                            mapboxMap.removePolygon(selectedPolygon);
-                        }
 
-
-                        if (featureMarker != null) {
-                            mapboxMap.removeMarker(featureMarker);
-                        }
 
                         final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
                         List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
 
+
+                         // when click, found multiple features.
                         if (features.size() > 0) {
-                            Feature feature = features.get(0);
-                            String featureId = features.get(0).getId();
 
 
+                         for (int a = 0; a< features.size(); a++) {
 
-                            // ========= highlight selected feature =================
-
-
-
-
-
-                            for (int a = 0; a < features.size(); a++) {
-                                if (featureId.equals(features.get(a).getId())) {
+                             Feature feature = features.get(a);
+                             String featureId = features.get(a).getId();
+                             Log.e("feature ID", featureId);
 
 
-                                    //++++++++++ polygon ++++++++++++
-                                    if (features.get(a).getGeometry() instanceof Polygon) {
-
-                                        List<LatLng> list = new ArrayList<>();
-                                        for (int i = 0; i < ((Polygon) features.get(a).getGeometry()).getCoordinates().size(); i++) {
-                                            for (int j = 0;
-                                                 j < ((Polygon) features.get(a).getGeometry()).getCoordinates().get(i).size(); j++) {
-                                                list.add(new LatLng(
-                                                        ((Polygon) features.get(a).getGeometry()).getCoordinates().get(i).get(j).getLatitude(),
-                                                        ((Polygon) features.get(a).getGeometry()).getCoordinates().get(i).get(j).getLongitude()
-                                                ));
-                                            }
-                                        }
-
-                                        selectedPolygon = mapboxMap.addPolygon(new PolygonOptions()
-                                                .addAll(list)
-                                                .fillColor(Color.parseColor("#8A8ACB"))
-                                        );
-                                    }// if polygon
-                                    // +++++++++ End polygon +++++++++++++++++
+                             // Mapbox base feature, featureID normally <10, should filter out those,  if number > 100, featureID.length >2
+                            // if (Integer.parseInt(featureId) > 10) {
+                            //     if (featureId.length()>2) {
+                           // above rules for mapbox host style only, self host does not apply
 
 
+                                    // remove last time high lighted feature and marker info window
+                                     if (selectedPolygon != null) {
+                                         mapboxMap.removePolygon(selectedPolygon);
+                                     }
 
-                                    //++++++++++ polyline ++++++++++++
-                                    if (features.get(a).getGeometry() instanceof MultiLineString) {
-
-                                        List<LatLng> list = new ArrayList<>();
-                                        for (int i = 0; i < ((MultiLineString) features.get(a).getGeometry()).getCoordinates().size(); i++) {
-                                            for (int j = 0;
-                                                 j < ((Polygon) features.get(a).getGeometry()).getCoordinates().get(i).size(); j++) {
-                                                list.add(new LatLng(
-                                                        ((MultiLineString) features.get(a).getGeometry()).getCoordinates().get(i).get(j).getLatitude(),
-                                                        ((MultiLineString) features.get(a).getGeometry()).getCoordinates().get(i).get(j).getLongitude()
-                                                ));
-                                            }
-                                        }
-
-                                        selectedPolyline = mapboxMap.addPolyline(new PolylineOptions()
-                                                .addAll(list)
-                                                .color(Color.parseColor("#8A8ACB"))
-                                        );
-                                    }// if polygon
-                                    // +++++++++ End polyline +++++++++++++++++
+                                     if (selectedPolyline != null) {
+                                         mapboxMap.removePolyline(selectedPolyline);
+                                     }
 
 
-
-                                }
-                            }
+                                     if (featureMarker != null) {
+                                         mapboxMap.removeMarker(featureMarker);
+                                     }
+                                     // End remove last time high lighted feature and marker info window
 
 
 
@@ -267,47 +285,120 @@ public class CheeseDetailActivity extends AppCompatActivity {
 
 
 
-
-
-                            //========== end highlight selected feature ===================
-
+                                 // ========= highlight selected feature =================
 
 
 
+                                         //++++++++++ polygon ++++++++++++
+                                         if (feature.getGeometry() instanceof com.mapbox.services.commons.geojson.Polygon) {
 
-                            //--------- get properties--------------
-                            String property;
+                                             List<LatLng> list = new ArrayList<>();
+                                             for (int i = 0; i < ((com.mapbox.services.commons.geojson.Polygon) feature.getGeometry()).getCoordinates().size(); i++) {
+                                                 for (int j = 0;
+                                                      j < ((com.mapbox.services.commons.geojson.Polygon) feature.getGeometry()).getCoordinates().get(i).size(); j++) {
+                                                     list.add(new LatLng(
+                                                             ((com.mapbox.services.commons.geojson.Polygon) feature.getGeometry()).getCoordinates().get(i).get(j).getLatitude(),
+                                                             ((com.mapbox.services.commons.geojson.Polygon) feature.getGeometry()).getCoordinates().get(i).get(j).getLongitude()
+                                                     ));
+                                                 }
+                                             }
 
-                            StringBuilder stringBuilder = new StringBuilder();
-                            if (feature.getProperties() != null) {
-                                for (Map.Entry<String, JsonElement> entry : feature.getProperties().entrySet()) {
-                                    stringBuilder.append(String.format("%s - %s", entry.getKey(), entry.getValue()));
-                                    stringBuilder.append(System.getProperty("line.separator"));
-                                }
+                                             selectedPolygon = mapboxMap.addPolygon(new PolygonOptions()
+                                                     .addAll(list)
+                                                     .fillColor(Color.parseColor("#8A8ACB"))
+                                             );
+                                         }// if polygon
+                                         // +++++++++ End polygon +++++++++++++++++
 
-                                featureMarker = mapboxMap.addMarker(new MarkerViewOptions()
-                                        .position(point)
-                                        .title("Properties:")
-                                        .snippet(stringBuilder.toString())
-                                );
 
-                            } else {
-                                property = "No feature properties found";
-                                featureMarker = mapboxMap.addMarker(new MarkerViewOptions()
-                                        .position(point)
-                                        .snippet(property)
-                                );
-                            }
-                        } else {
-                            featureMarker = mapboxMap.addMarker(new MarkerViewOptions()
-                                    .position(point)
-                                    .snippet("No feature properties found")
-                            );
+                                         //++++++++++ linestring ++++++++++++
+                                         else if (feature.getGeometry() instanceof com.mapbox.services.commons.geojson.LineString) {
+
+                                             List<LatLng> list = new ArrayList<>();
+
+                                             for (int j = 0;
+                                                  j < ((com.mapbox.services.commons.geojson.LineString) feature.getGeometry()).getCoordinates().size(); j++) {
+                                                 list.add(new LatLng(
+                                                         ((com.mapbox.services.commons.geojson.LineString) feature.getGeometry()).getCoordinates().get(j).getLatitude(),
+                                                         ((com.mapbox.services.commons.geojson.LineString) feature.getGeometry()).getCoordinates().get(j).getLongitude()
+                                                 ));
+                                             }
+
+                                             Log.e("click line string++++++", "++++++++++++++++++++++++++++++++++++++");
+
+                                             selectedPolyline = mapboxMap.addPolyline(new PolylineOptions()
+                                                     .addAll(list)
+                                                     .color(Color.parseColor("#8A8ACB"))
+                                             );
+                                         }// if linestring
+                                         // +++++++++ End linestring +++++++++++++++++
+
+
+
+
+                                         else if (feature.getGeometry() instanceof com.mapbox.services.commons.geojson.Point) {
+
+
+                                             Log.e("Point***", "************");
+
+
+                                         }// if point
+
+
+                                 //========== end highlight selected feature ===================
+
+
+                                 //--------- get properties--------------
+                                 String property;
+
+                                 StringBuilder stringBuilder = new StringBuilder();
+                                 if (feature.getProperties() != null) {
+                                     for (Map.Entry<String, JsonElement> entry : feature.getProperties().entrySet()) {
+                                         stringBuilder.append(String.format("%s - %s", entry.getKey(), entry.getValue()));
+                                         stringBuilder.append(System.getProperty("line.separator"));
+                                     }
+
+                                     featureMarker = mapboxMap.addMarker(new MarkerViewOptions()
+                                                     .position(point)
+                                                     .title("Properties:")
+                                                     .snippet(stringBuilder.toString())
+
+                                             //  .infoWindowAnchor(.5f, 1.0f)
+                                     );
+
+                                 } else {
+                                     property = "No feature properties found";
+                                     featureMarker = mapboxMap.addMarker(new MarkerViewOptions()
+                                             .position(point)
+                                             .snippet(property)
+                                     );
+                                 }
+
+
+                                 mapboxMap.selectMarker(featureMarker);
+
+                                 //------------ end get properties ---------------
+
+
+
+
+
+                            // } // if featureID >10
+
+
+                         }// for
+
                         }//else if features.size > 0
 
-                        mapboxMap.selectMarker(featureMarker);
 
-                        //------------ end get properties ---------------
+
+
+
+
+
+
+
+
 
                     }// on map click
                 });// set on map click listener

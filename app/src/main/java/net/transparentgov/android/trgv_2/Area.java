@@ -13,42 +13,32 @@ import java.util.Map;
 
 public class Area {
 
-    public static Boolean hasTile(String _a_sbj){
 
-        final String[] tileList = { "City_Address", "City_General_Land_Use", "City_Parcels", "City_Streets","City_Zoning",
-                "Santa_Monica_Buildings","Santa_Monica_Parcels","Santa_Monica_Speed_Limit","Santa_Monica_Street_Sweeping","Santa_Monica_Streets","Santa_Monica_Zoning",
-                "Newport_Beach_Address","Newport_Beach_General_Land_Use","Newport_Beach_Parcels","Newport_Beach_Right_Of_Way",  "Newport_Beach_Streets","Newport_Beach_Zoning",
-                "county_parks","county_streets","county_address",
-                "Palo_Alto_Addresses","Palo_Alto_Building","Palo_Alto_Parcels","Palo_Alto_Right_of_way","Palo_Alto_Streets","Palo_Alto_Zoning",
-
-                "Shoreline_Address_Central", "Shoreline_Buildings","Shoreline_Crosswalk_Driveways","Shoreline_Curb","Shoreline_Curb_Ramp","Shoreline_Encumbrance","Shoreline_Land_Use_Comp_Plan","Shoreline_Pavement","Shoreline_Pavement_Condition","Shoreline_Sidewalk",
-                "Shoreline_Street", "Shoreline_Street_Light","Shoreline_Tax_Parcel_Central","Shoreline_Traffic_Pave_Striping","Shoreline_Zoning",
-
-                "New_York_Address","New_York_Building","New_York_Building_Demolition","New_York_Commercial_Zone","New_York_Manhattan_Zoning","New_York_Parks", "New_York_Sidewalk","New_York_Streets","New_York_Zone_Districts",
-                "Chicago_Bike_Routes","Chicago_Buildings","Chicago_Curbs","Chicago_Major_Streets","Chicago_Parks","Chicago_Schools","Chicago_Streets_Sweeping", "Chicago_Zoning",
-
-                "San_Francisco_Height_And_Bulk_Districts","San_Francisco_Parcels","San_Francisco_Streets","San_Francisco_Zoning_Districts",
-                "San_Francisco_Address","San_Francisco_Blocks","San_Francisco_Building_Footprint","San_Francisco_Curb_Island","San_Francisco_Downtown_Address","San_Francisco_Downtown_Land_Use","San_Francisco_Downtown_Zoning",
-
-                "Los_Angeles_County_Parcels","Los_Angeles_General_Land_Use","Los_Angeles_Zoning"
-
-        };
-
-        Boolean result = false;
-
-        for (int i = 0; i < tileList.length; i++) {
-            if (_a_sbj.equals(tileList[i]));
-
-            result =  true;
-            break;
-
-        };
+    public static String getMapBoxStyleUrl(String _area, String area_subject) {
 
 
-        return result;
+
+
+        /*
+        Map<String,String> mapbox_style_url = new HashMap<String, String>();
+        mapbox_style_url.put("city_all","mapbox://styles/hoogw/ciqck140k0015g0nl5z1uq2v7");
+        mapbox_style_url.put("city_address","mapbox://styles/hoogw/ciqcn42gx003ebzm9v86elejr");
+        mapbox_style_url.put("city_parcels","mapbox://styles/hoogw/ciqcn7oww001ag0nlbi22gj8i");
+        mapbox_style_url.put("city_streets","mapbox://styles/hoogw/ciqcnhx0m003acrnfdg2be0v7");
+        return mapbox_style_url.get(area_subject);
+        */
+
+
+
+       /* mapbox_style_url.put("city_address","http://166.62.80.50:10/tilejson/city/city_address.json");
+        mapbox_style_url.put("city_parcels","http://166.62.80.50:10/tilejson/city/city_parcels.json");*/
+
+        String _style_url = "http://166.62.80.50:10/tilejson/" + _area + "/" + area_subject + ".json";
+
+
+
+        return _style_url;
     }
-
-
 
 
     public static Map<String,List<Double>> getAreaInitLocation() {
